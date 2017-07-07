@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="delivary.mybatis.mapper">
+<!--id 중복 검사 -->
+<select id = "duplexChk" parameterType="String" resultType="delivary.mybatis.UserVO">
+	SELECT * FROM project2_user WHERE UPPER(u_id) = #{u_id}
+</select>
+<select id = "getIdx" parameterType="String" resultType="delivary.mybatis.UserVO">
+	SELECT * FROM project2_user WHERE idx = #{idx}
+</select>
+<select id = "login" parameterType="delivary.mybatis.UserVO" resultType="delivary.mybatis.UserVO">
+	SELECT * FROM project2_user WHERE u_id = #{u_id} AND pwd = #{pwd}
+</select>
+<insert id="join" parameterType="delivary.mybatis.UserVO">
+	INSERT INTO project2_user VALUES (project2_user_seq.nextval, #{u_id},
+#{depart_id}, #{pwd}, #{username}, #{zip}, #{addr}, #{addr2}, #{phone}, #{email}, #{point}, #{chk})
+</insert>
+<!-- search -->
+<select id ="getCode" resultType="delivary.mybatis.StatusVO" parameterType="String">
+	SELECT * FROM orderuser u INNER JOIN orderlist l ON u.odx = l.odx WHERE u.odx = #{odx}
+</select>
+<select id ="getCodeById" resultType="delivary.mybatis.StatusVO" parameterType="String">
+	SELECT * FROM orderuser u INNER JOIN orderlist l ON u.odx = l.odx WHERE u.odx IN (
+	SELECT u.odx FROM orderuser u INNER JOIN project2_user l ON u.idx = l.idx WHERE u.idx = #{idx})
+</select>
+<!-- order -->
+<select id ="Allhub" resultType="delivary.mybatis.StatusVO">
+	SELECT * FROM hub
+</select>
+<select id = "AllProduct" resultType="delivary.mybatis.ProductVO">
+	SELECT * FROM product
+</select>
+<insert id = "insertProduct" parameterType="delivary.mybatis.StatusVO">
+	INSERT INTO orderuser values(#{idx}, #{u_id}, orderuser_seq.nextval, #{oname}, #{ozip}, #{oaddr}, #{oaddr2}, #{ophone}, #{oname_2}, #{ozip_2}, #{oaddr_2}, #{oaddr2_2}, #{ophone_2}, sysdate, sysdate + 3, 'o', #{lengthcode})
+</insert>
+<select id ="getProduct" resultType="delivary.mybatis.ProductVO" parameterType="String">
+	SELECT * FROM product WHERE product_code = #{product_code}
+</select>
+<select id = "getSeq" resultType="int">
+	SELECT orderuser_seq.currval FROM DUAL
+</select>
+<insert id="insertOrderList" parameterType="delivary.mybatis.ProductVO">
+	INSERT INTO orderlist VALUES(orderlist_seq.nextval, #{product_code}, #{odx}, #{product_name}, #{list_saleprice}, #{list_count})
+</insert>
+<!-- bill -->
+<select id="billChk" resultType="delivary.mybatis.lengthVO" parameterType="delivary.mybatis.lengthVO">
+	SELECT * FROM length where l_start_num = #{l_start_num} and l_end_num = #{l_end_num}
+</select>
+<select id="billChk2" resultType="delivary.mybatis.lengthVO" parameterType="delivary.mybatis.lengthVO">
+	SELECT * FROM length where l_start = #{l_start} and l_end = #{l_end}
+</select>
+<!-- list -->
+<select id="AllListed" resultType="delivary.mybatis.DiaryVO">
+		select * from noticed order by v_idx
+</select>
+	<select id="OneListed" resultType="delivary.mybatis.DiaryVO" parameterType="String">
+		select * from noticed where v_idx = #{idx}
+	</select>
+	  <select id="pageListed" resultType="delivary.mybatis.DiaryVO" parameterType="Map">
+		select * from (select rownum r_num, a.* from (select * from noticed order by v_idx) a
+		) where r_num between #{begin} and #{end}
+	</select>
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
